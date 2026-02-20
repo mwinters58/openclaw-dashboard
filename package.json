@@ -1,7 +1,14 @@
 {
   "name": "openclaw-dashboard",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "Real-time dashboard for monitoring OpenClaw processes with live streaming",
   "private": true,
+  "keywords": ["openclaw", "dashboard", "automation", "monitoring", "real-time"],
+  "author": "Mike Winters",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mwinters58/openclaw-dashboard.git"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

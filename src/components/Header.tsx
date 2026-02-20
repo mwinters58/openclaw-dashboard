@@ -1,9 +1,22 @@
 interface HeaderProps {
   lastUpdate: Date
   processCount: number
+  connectionStatus?: 'connected' | 'disconnected' | 'connecting'
+  error?: string | null
+  isLoading?: boolean
+  streamingEnabled?: boolean
+  onToggleStreaming?: () => void
 }
 
-export default function Header({ lastUpdate, processCount }: HeaderProps) {
+export default function Header({ 
+  lastUpdate, 
+  processCount, 
+  connectionStatus = 'connecting',
+  error,
+  isLoading = false,
+  streamingEnabled = false,
+  onToggleStreaming
+}: HeaderProps) {
   return (
     <div className="bg-white/10 backdrop-blur-md rounded-xl mb-4 p-4 shadow-lg">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -22,19 +35,62 @@ export default function Header({ lastUpdate, processCount }: HeaderProps) {
         </div>
         
         <div className="flex items-center gap-4">
+          {/* Connection Status */}
           <div className="flex items-center gap-2 text-white/80 text-sm">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="hidden sm:inline">Last update:</span>
-            <span className="sm:hidden">Updated:</span>
-            <time className="font-mono">
-              {lastUpdate.toLocaleTimeString([], { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                second: '2-digit'
-              })}
-            </time>
+            {connectionStatus === 'connected' && (
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" title="Connected to OpenClaw Gateway"></div>
+            )}
+            {connectionStatus === 'disconnected' && (
+              <div className="w-2 h-2 bg-red-400 rounded-full" title="Disconnected from OpenClaw Gateway"></div>
+            )}
+            {connectionStatus === 'connecting' && (
+              <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" title="Connecting to OpenClaw Gateway"></div>
+            )}
+            
+            {isLoading ? (
+              <span className="text-yellow-300">Loading...</span>
+            ) : error ? (
+              <span className="text-red-300 hidden sm:inline">{error}</span>
+            ) : (
+              <>
+                <span className="hidden sm:inline">Last update:</span>
+                <span className="sm:hidden">Updated:</span>
+                <time className="font-mono">
+                  {lastUpdate.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit'
+                  })}
+                </time>
+              </>
+            )}
           </div>
           
+          {/* Streaming Toggle Button */}
+          {onToggleStreaming && (
+            <button 
+              onClick={onToggleStreaming}
+              className={`transition-colors rounded-lg p-2 text-white text-sm px-3 ${
+                streamingEnabled 
+                  ? 'bg-green-500/20 hover:bg-green-500/30' 
+                  : 'bg-yellow-500/20 hover:bg-yellow-500/30'
+              }`}
+              title={streamingEnabled ? "Switch to polling mode" : "Enable live streaming"}
+            >
+              {streamingEnabled ? (
+                <span className="flex items-center gap-1">
+                  <span className="text-green-400">📡</span>
+                  <span className="hidden sm:inline">Live</span>
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <span className="text-yellow-400">🔄</span>
+                  <span className="hidden sm:inline">Poll</span>
+                </span>
+              )}
+            </button>
+          )}
+
           <button 
             onClick={() => window.location.reload()}
             className="bg-white/20 hover:bg-white/30 transition-colors rounded-lg p-2 text-white"
